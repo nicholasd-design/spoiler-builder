@@ -540,17 +540,30 @@ function renderOutput() {
     const labelHtml   = esc(s.label);
     const contentHtml = esc(s.content).replace(/\n/g, '<br>');
     return h3
-      + "<div style='" + WRAP + "'>"
-      + "<div style='" + HDR + "' onclick=\"" + TOGGLE_ONCLICK + "\">"
+      + "<div data-sp-w style='" + WRAP + "'>"
+      + "<div data-sp-h style='" + HDR + "' onclick=\"" + TOGGLE_ONCLICK + "\">"
       + "<span style='" + WARN + "'>&#x26A0;&#xFE0F; SPOILER</span>"
-      + "<span style='" + LBL + "'>" + labelHtml + "</span>"
-      + "<span style='" + ARR + "'>\u25BC</span>"
+      + "<span data-sp-l style='" + LBL + "'>" + labelHtml + "</span>"
+      + "<span data-sp-a style='" + ARR + "'>\u25BC</span>"
       + "</div>"
-      + "<div style='" + CONT + "'><p style='margin:0'>" + contentHtml + "</p></div>"
+      + "<div data-sp-c style='" + CONT + "'><p style='margin:0'>" + contentHtml + "</p></div>"
       + "</div>";
   }).join('\n');
 
-  const html = "<div style='font-family:Roboto,sans-serif'>" + items + '</div>';
+  const darkFn = "(function(){"
+    + "var q=function(a){return document.querySelectorAll(a)},"
+    + "m=window.matchMedia('(prefers-color-scheme: dark)'),"
+    + "f=function(d){"
+    + "q('[data-sp-w]').forEach(function(e){e.style.background=d?'#1e1e1e':'#ffffff';e.style.borderColor=d?'#2a2a2a':'#d3d3d3'});"
+    + "q('[data-sp-h]').forEach(function(e){e.style.background=d?'#252525':'#f5f5f5'});"
+    + "q('[data-sp-l]').forEach(function(e){e.style.color=d?'#f0f0f0':'#111111'});"
+    + "q('[data-sp-a]').forEach(function(e){e.style.color=d?'#888888':'#666666'});"
+    + "q('[data-sp-c]').forEach(function(e){e.style.background=d?'#161616':'#ffffff';e.style.color=d?'#c0c0c0':'#444444'});};"
+    + "window._spDark||(window._spDark=1,m.addEventListener('change',function(e){f(e.matches)}));"
+    + "f(m.matches);})()";
+
+  const html = "<div style='font-family:Roboto,sans-serif'>" + items + '</div>\n'
+    + '<scr' + 'ipt>' + darkFn + '</scr' + 'ipt>';
 
   const out = document.getElementById('outputCode');
   out.textContent = html;
