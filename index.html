@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TG Spoiler Builder</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23000'/><rect x='9' y='6' width='14' height='18' rx='2' fill='none' stroke='%23ff6b0f' stroke-width='2'/><circle cx='16' cy='15' r='2.5' fill='%23ff6b0f'/><line x1='16' y1='17.5' x2='16' y2='21' stroke='%23ff6b0f' stroke-width='2' stroke-linecap='round'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ── BASE ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Roboto', sans-serif; background: #f2f2f2; color: #111111; font-size: 14px; min-height: 100vh; }
+h1,h2,h3,h4 { font-family: 'Rajdhani', sans-serif; font-weight: 700; line-height: 1.2; }
+input, select, textarea, button { font-family: inherit; font-size: 14px; }
+
+/* ── HEADER ─────────────────────────────────────────────────────── */
+.header {
+  background: #111111; border-bottom: 2px solid #ff6b0f;
+  padding: 0 24px; height: 56px;
+  display: flex; align-items: center; gap: 14px;
+}
+.header-logo { display: flex; align-items: center; gap: 12px; }
+.header-logo img { height: 26px; width: auto; }
+.header-logo img:last-of-type { height: 13px; }
+.header-logo-sep { width: 1px; height: 20px; background: #d0d0d0; }
+.header-sep { width: 1px; height: 24px; background: #d0d0d0; }
+.header-title { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: #f0f0f0; }
+.header-title span { color: #ff6b0f; }
+.header-sub { font-size: 12px; color: #888888; margin-left: 2px; }
+
+/* ── LAYOUT ─────────────────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  grid-template-rows: auto 1fr;
+  height: calc(100vh - 56px);
+}
+.panel-left {
+  grid-column: 1; grid-row: 1 / 3;
+  border-right: 1px solid #d0d0d0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.panel-right {
+  grid-column: 2; grid-row: 1 / 3;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── PANEL HEADERS ──────────────────────────────────────────────── */
+.panel-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid #d0d0d0;
+  background: #ffffff;
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.panel-header h2 { font-size: 15px; color: #111111; }
+.panel-scroll { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #d0d0d0 transparent; }
+
+/* ── FORM SECTION ───────────────────────────────────────────────── */
+.form-section { padding: 18px; border-bottom: 1px solid #d0d0d0; }
+.form-section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .8px; color: #666666; margin-bottom: 14px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 12px; font-weight: 700; color: #666666; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+.field input, .field textarea {
+  width: 100%; background: #ebebeb; border: 1px solid #d0d0d0;
+  border-radius: 6px; padding: 9px 11px;
+  color: #111111; outline: none; transition: border-color .2s;
+}
+.field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+.field input:focus, .field textarea:focus { border-color: #ff6b0f; }
+.field input::placeholder, .field textarea::placeholder { color: #aaaaaa; }
+.char-count { font-size: 11px; color: #aaaaaa; text-align: right; margin-top: 3px; }
+
+.btn-add {
+  width: 100%; background: #ff6b0f; color: #fff; border: none;
+  border-radius: 6px; padding: 10px;
+  font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700;
+  letter-spacing: .5px; cursor: pointer; transition: background .2s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn-add:hover { background: #c24a00; }
+.btn-add:disabled { background: #aaaaaa; cursor: not-allowed; }
+
+/* ── META SECTION ───────────────────────────────────────────────── */
+.meta-section { padding: 16px 18px; border-bottom: 1px solid #d0d0d0; background: rgba(255,107,15,.04); }
+.meta-section h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: #666666; margin-bottom: 12px; }
+
+/* ── SPOILER LIST ────────────────────────────────────────────────── */
+.spoiler-list-section { padding: 14px 18px; }
+.spoiler-list-section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .8px; color: #666666; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.spoiler-list-section h3 .count { color: #ff6b0f; }
+.spoiler-item {
+  background: #ebebeb; border: 1px solid #d0d0d0;
+  border-radius: 6px; padding: 10px 12px;
+  margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px;
+  transition: border-color .2s;
+}
+.spoiler-item:hover { border-color: #ff6b0f; }
+.spoiler-item-drag { color: #aaaaaa; cursor: grab; font-size: 16px; flex-shrink: 0; padding-top: 2px; }
+.spoiler-item-body { flex: 1; min-width: 0; }
+.spoiler-item-label { font-size: 13px; font-weight: 700; color: #111111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spoiler-item-preview { font-size: 11px; color: #888888; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spoiler-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-icon {
+  background: none; border: 1px solid #d0d0d0; border-radius: 4px;
+  color: #666666; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px; transition: .2s;
+}
+.btn-icon:hover { border-color: #ff6b0f; color: #ff6b0f; }
+.btn-icon:disabled { opacity: .3; pointer-events: none; }
+.btn-icon.del:hover { border-color: #ff1540; color: #ff1540; }
+.empty-list {
+  text-align: center; padding: 28px 16px;
+  color: #aaaaaa; font-size: 13px;
+}
+.empty-list .ico { font-size: 28px; margin-bottom: 8px; }
+
+/* ── RIGHT PANEL — TABS ─────────────────────────────────────────── */
+.tabs { display: flex; border-bottom: 1px solid #d0d0d0; background: #ffffff; flex-shrink: 0; }
+.tab {
+  padding: 12px 20px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: .5px; color: #666666; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: .2s; user-select: none; background: none; border-top: none; border-left: none; border-right: none;
+}
+.tab:hover { color: #111111; }
+.tab.active { color: #ff6b0f; border-bottom-color: #ff6b0f; }
+
+/* ── PREVIEW PANEL ──────────────────────────────────────────────── */
+.preview-wrap {
+  flex: 1; padding: 24px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: #d0d0d0 transparent;
+  display: none;
+}
+.preview-wrap.active { display: block; }
+.preview-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+  color: #666666; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
+}
+.preview-mode-btns { display: flex; gap: 4px; }
+.preview-mode-btn {
+  background: none; border: 1px solid #d0d0d0; border-radius: 4px;
+  color: #666666; padding: 3px 9px; font-size: 11px; font-weight: 700;
+  font-family: 'Rajdhani', sans-serif; letter-spacing: .5px; text-transform: uppercase;
+  cursor: pointer; transition: .15s;
+}
+.preview-mode-btn:hover { border-color: #ff6b0f; color: #ff6b0f; }
+.preview-mode-btn.active { background: #ff6b0f; border-color: #ff6b0f; color: #fff; }
+
+/* Preview spoiler — layout only; colors injected as inline styles by renderPreview() */
+.preview-spoiler-wrap {
+  border-radius: 6px; overflow: hidden; margin-bottom: 10px;
+}
+.preview-spoiler-header {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  cursor: pointer; user-select: none;
+}
+.preview-spoiler-warn { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.preview-spoiler-label { flex: 1; font-size: 14px; font-weight: 600; }
+.preview-spoiler-arrow { transition: transform .2s; display: inline-block; font-size: 12px; }
+.preview-spoiler-content {
+  display: none; padding: 14px 16px;
+  font-size: 14px; line-height: 1.6;
+}
+.preview-empty {
+  text-align: center; padding: 60px 20px; color: #aaaaaa;
+  font-size: 14px; border: 2px dashed #d0d0d0; border-radius: 10px;
+}
+.preview-empty .ico { font-size: 36px; margin-bottom: 12px; }
+
+/* ── OUTPUT PANEL ───────────────────────────────────────────────── */
+.output-wrap { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+.output-wrap.active { display: flex; }
+.output-toolbar {
+  padding: 12px 18px; border-bottom: 1px solid #d0d0d0;
+  background: #ffffff; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.output-toolbar p { font-size: 13px; color: #666666; flex: 1; }
+.btn-copy-all {
+  background: #ff6b0f; color: #fff; border: none;
+  border-radius: 6px; padding: 8px 18px;
+  font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: .5px; cursor: pointer; transition: background .2s;
+  display: flex; align-items: center; gap: 7px; white-space: nowrap;
+}
+.btn-copy-all:hover { background: #c24a00; }
+.btn-copy-all.copied { background: #10c46e; }
+.btn-clear-all {
+  background: none; border: 1px solid #d0d0d0; color: #666666;
+  border-radius: 6px; padding: 8px 14px;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: .2s;
+}
+.btn-clear-all:hover { border-color: #ff1540; color: #ff1540; }
+.output-code {
+  flex: 1; overflow-y: auto;
+  background: #f8f8f8;
+  padding: 18px;
+  font-family: 'Courier New', monospace; font-size: 12.5px;
+  color: #1a4a1a; line-height: 1.6;
+  white-space: pre; tab-size: 2;
+  scrollbar-width: thin; scrollbar-color: #d0d0d0 transparent;
+}
+.output-placeholder { color: #aaaaaa; }
+.output-empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; color: #aaaaaa; gap: 10px;
+}
+.output-empty .ico { font-size: 36px; }
+
+/* ── TOAST ──────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #ffffff; border: 1px solid #d0d0d0; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; color: #111111;
+  z-index: 9999; opacity: 0; pointer-events: none; transition: opacity .3s;
+  display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,.6);
+}
+.toast.show { opacity: 1; }
+.toast .ico { color: #10c46e; }
+
+/* ── DARK MODE ──────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  body { background: #0d0d0d; color: #f0f0f0; }
+  .header { background: #0a0a0a; }
+  .header-logo-sep { background: #2a2a2a; }
+  .header-sep { background: #2a2a2a; }
+  .header-sub { color: #666666; }
+  .panel-left { border-right-color: #2a2a2a; }
+  .panel-header { border-bottom-color: #2a2a2a; background: #161616; }
+  .panel-header h2 { color: #f0f0f0; }
+  .panel-scroll { scrollbar-color: #2a2a2a transparent; }
+  .form-section { border-bottom-color: #2a2a2a; }
+  .form-section h3 { color: #888888; }
+  .field label { color: #888888; }
+  .field input, .field textarea { background: #1e1e1e; border-color: #2a2a2a; color: #f0f0f0; }
+  .field input::placeholder, .field textarea::placeholder { color: #444444; }
+  .char-count { color: #444444; }
+  .btn-add:disabled { background: #444444; }
+  .meta-section { border-bottom-color: #2a2a2a; }
+  .meta-section h3 { color: #888888; }
+  .spoiler-list-section h3 { color: #888888; }
+  .spoiler-item { background: #1e1e1e; border-color: #2a2a2a; }
+  .spoiler-item-drag { color: #444444; }
+  .spoiler-item-label { color: #f0f0f0; }
+  .spoiler-item-preview { color: #666666; }
+  .btn-icon { border-color: #2a2a2a; color: #888888; }
+  .empty-list { color: #444444; }
+  .tabs { border-bottom-color: #2a2a2a; background: #161616; }
+  .tab { color: #888888; }
+  .tab:hover { color: #f0f0f0; }
+  .preview-wrap { scrollbar-color: #2a2a2a transparent; }
+  .preview-label { color: #888888; }
+  .preview-mode-btn { border-color: #2a2a2a; color: #888888; }
+  .preview-empty { color: #444444; border-color: #2a2a2a; }
+  .output-toolbar { border-bottom-color: #2a2a2a; background: #161616; }
+  .output-toolbar p { color: #888888; }
+  .btn-clear-all { border-color: #2a2a2a; color: #888888; }
+  .output-code { background: #0a0a0a; color: #b0cfb0; scrollbar-color: #2a2a2a transparent; }
+  .output-placeholder { color: #444444; }
+  .output-empty { color: #444444; }
+  .toast { background: #222222; border-color: #2a2a2a; color: #f0f0f0; }
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"><span class="ico">✓</span><span id="toastMsg"></span></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo">
+    <img src="https://static0.thegamerimages.com/assets/images/tg-logo-full-colored-light.svg?v=3.6" alt="TheGamer">
+    <div class="header-logo-sep"></div>
+    <img src="https://static1.gamerantimages.com/assets/images/gr-logo-full-colored-light.svg?v=3.6" alt="Game Rant">
+  </div>
+  <div class="header-sep"></div>
+  <div>
+    <div class="header-title">Spoiler Toggle <span>Builder</span></div>
+    <div class="header-sub">Generates Emaki-friendly, CMS-ready spoiler injection snippet</div>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- LEFT PANEL — INPUT -->
+  <div class="panel-left">
+    <div class="panel-header">
+      <h2>➕ Add Spoilers</h2>
+    </div>
+
+    <div class="panel-scroll">
+
+      <!-- Section metadata -->
+      <div class="meta-section">
+        <h3>Section Settings</h3>
+        <div class="field">
+          <label>Article / Game Title</label>
+          <input type="text" id="metaGame" placeholder="e.g. Elden Ring: Shadow of the Erdtree" oninput="renderAll()">
+        </div>
+      </div>
+
+      <!-- Add spoiler form -->
+      <div class="form-section">
+        <h3>Spoiler Entry</h3>
+        <div class="field">
+          <label>Section Heading (H3) <span style="color:#888">optional</span></label>
+          <input type="text" id="fHeading" placeholder="e.g. 1st Letter">
+        </div>
+        <div class="field">
+          <label>Spoiler Label <span style="color:#ff1540">*</span></label>
+          <input type="text" id="fLabel" placeholder="e.g. Final Boss Identity &amp; True Ending Revealed" oninput="updateCharCount('fLabel','cLabel',80); validateForm()">
+          <div class="char-count" id="cLabel">0 / 80</div>
+        </div>
+        <div class="field">
+          <label>Spoiler Content <span style="color:#ff1540">*</span></label>
+          <textarea id="fContent" placeholder="Enter the spoiler text here..." oninput="validateForm()" rows="4"></textarea>
+        </div>
+        <button class="btn-add" id="addBtn" onclick="addSpoiler()" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Spoiler
+        </button>
+      </div>
+
+      <!-- Spoiler list -->
+      <div class="spoiler-list-section">
+        <h3>Spoilers in Section (<span class="count" id="spoilerCount">0</span>)</h3>
+        <div id="spoilerList">
+          <div class="empty-list">
+            <div class="ico">🔒</div>
+            No spoilers yet. Add your first spoiler above.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panel-scroll -->
+  </div><!-- /panel-left -->
+
+  <!-- RIGHT PANEL — PREVIEW + OUTPUT -->
+  <div class="panel-right">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('preview')">👁 Live Preview</button>
+      <button class="tab" onclick="switchTab('output')">📋 HTML Snippet</button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-wrap active" id="tabPreview">
+      <div class="preview-label">
+        Live Preview
+        <div class="preview-mode-btns">
+          <button class="preview-mode-btn" data-mode="light" onclick="setPreviewMode('light')">☀ Light</button>
+          <button class="preview-mode-btn" data-mode="dark" onclick="setPreviewMode('dark')">☾ Dark</button>
+        </div>
+      </div>
+      <div id="previewContainer">
+        <div class="preview-empty">
+          <div class="ico">🔒</div>
+          Add spoilers on the left to see a live preview here.
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-wrap" id="tabOutput">
+      <div class="output-toolbar">
+        <p>Paste this snippet directly into your article's HTML source or CMS block editor.</p>
+        <button class="btn-clear-all" onclick="clearAll()">🗑 Clear All</button>
+        <button class="btn-copy-all" id="copyAllBtn" onclick="copyAllHtml()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy HTML
+        </button>
+      </div>
+      <pre class="output-code" id="outputCode"><span class="output-placeholder">← Add spoilers and switch to this tab to see the generated HTML.</span></pre>
+    </div>
+
+  </div><!-- /panel-right -->
+</div><!-- /layout -->
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────
+let spoilers = [];
+let idCtr = 0;
+let previewMode = 'light';
+
+// ── PALETTE ───────────────────────────────────────────────────────────
+function palette(dark) {
+  return dark
+    ? { bg:'#1e1e1e', border:'#2a2a2a', hdrBg:'#252525', hdrHover:'#2e2e2e',
+        warn:'#ff6600', label:'#f0f0f0', arrow:'#888888',
+        contentBg:'#161616', contentText:'#c0c0c0' }
+    : { bg:'#ffffff', border:'#d3d3d3', hdrBg:'#f5f5f5', hdrHover:'#ececec',
+        warn:'#ff6b0f', label:'#111111', arrow:'#666666',
+        contentBg:'#ffffff', contentText:'#444444' };
+}
+
+// ── PREVIEW MODE ──────────────────────────────────────────────────────
+function setPreviewMode(mode) {
+  previewMode = mode;
+  document.querySelectorAll('.preview-mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+  renderPreview();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function updateCharCount(inputId, countId, max) {
+  const len = document.getElementById(inputId).value.length;
+  const el  = document.getElementById(countId);
+  el.textContent = `${len} / ${max}`;
+  el.style.color = len > max ? '#ff1540' : '';
+}
+function validateForm() {
+  const label   = document.getElementById('fLabel').value.trim();
+  const content = document.getElementById('fContent').value.trim();
+  document.getElementById('addBtn').disabled = !(label && content);
+}
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tabPreview').classList.toggle('active', name === 'preview');
+  document.getElementById('tabOutput').classList.toggle('active', name === 'output');
+  if (name === 'output') renderOutput();
+}
+let toastTimer;
+function toast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── ADD / REMOVE / MOVE ───────────────────────────────────────────────
+function addSpoiler() {
+  const heading = document.getElementById('fHeading').value.trim();
+  const label   = document.getElementById('fLabel').value.trim();
+  const content = document.getElementById('fContent').value.trim();
+  if (!label || !content) return;
+
+  spoilers.push({ id: ++idCtr, heading, label, content });
+  document.getElementById('fHeading').value = '';
+  document.getElementById('fLabel').value   = '';
+  document.getElementById('fContent').value = '';
+  document.getElementById('cLabel').textContent = '0 / 80';
+  document.getElementById('addBtn').disabled = true;
+  renderAll();
+  toast('\u2713 Spoiler added');
+}
+function removeSpoiler(id) {
+  spoilers = spoilers.filter(s => s.id !== id);
+  renderAll();
+}
+function moveSpoiler(id, dir) {
+  const i = spoilers.findIndex(s => s.id === id);
+  const j = i + dir;
+  if (j < 0 || j >= spoilers.length) return;
+  [spoilers[i], spoilers[j]] = [spoilers[j], spoilers[i]];
+  renderAll();
+}
+
+// ── RENDER SPOILER LIST (LEFT PANEL) ──────────────────────────────────
+function renderSpoilerList() {
+  const el = document.getElementById('spoilerList');
+  document.getElementById('spoilerCount').textContent = spoilers.length;
+
+  if (!spoilers.length) {
+    el.innerHTML = `<div class="empty-list"><div class="ico">\uD83D\uDD12</div>No spoilers yet. Add your first spoiler above.</div>`;
+    return;
+  }
+
+  el.innerHTML = spoilers.map((s, i) => {
+    const preview = s.content.length > 55 ? s.content.slice(0, 55) + '\u2026' : s.content;
+    return `
+      <div class="spoiler-item">
+        <span class="spoiler-item-drag" title="Drag to reorder">\u2807</span>
+        <div class="spoiler-item-body">
+          ${s.heading ? `<div class="spoiler-item-preview" style="color:#ff6b0f">H3: ${esc(s.heading)}</div>` : ''}
+          <div class="spoiler-item-label">${esc(s.label)}</div>
+          <div class="spoiler-item-preview">${esc(preview)}</div>
+        </div>
+        <div class="spoiler-item-actions">
+          <button class="btn-icon" onclick="moveSpoiler(${s.id},-1)" title="Move up" ${i === 0 ? 'disabled' : ''}>&#8593;</button>
+          <button class="btn-icon" onclick="moveSpoiler(${s.id},1)" title="Move down" ${i === spoilers.length - 1 ? 'disabled' : ''}>&#8595;</button>
+          <button class="btn-icon del" onclick="removeSpoiler(${s.id})" title="Remove">&#10005;</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── RENDER PREVIEW (RIGHT PANEL) ──────────────────────────────────────
+function renderPreview() {
+  const container = document.getElementById('previewContainer');
+
+  if (!spoilers.length) {
+    container.innerHTML = `<div class="preview-empty"><div class="ico">\uD83D\uDD12</div>Add spoilers on the left to see a live preview here.</div>`;
+    return;
+  }
+
+  const p = palette(previewMode === 'dark');
+
+  const items = spoilers.map(s => `
+    ${s.heading ? `<h3 style="font-family:'Rajdhani',sans-serif;font-size:18px;color:${p.label};margin:16px 0 6px">${esc(s.heading)}</h3>` : ''}
+    <div class="preview-spoiler-wrap" style="background:${p.bg};border:1px solid ${p.border}">
+      <div class="preview-spoiler-header" style="background:${p.hdrBg}" onclick="previewToggle(this)">
+        <span class="preview-spoiler-warn" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540">\u26A0\uFE0F SPOILER</span>
+        <span class="preview-spoiler-label" style="font-family:'Rajdhani',sans-serif;font-size:20px;color:${p.label}">${esc(s.label)}</span>
+        <span class="preview-spoiler-arrow" style="color:${p.arrow}">\u25BC</span>
+      </div>
+      <div class="preview-spoiler-content" style="background:${p.contentBg};color:${p.contentText}">
+        ${esc(s.content).replace(/\n/g, '<br>')}
+      </div>
+    </div>`
+  ).join('');
+
+  container.innerHTML = items;
+}
+
+function previewToggle(header) {
+  const content = header.nextElementSibling;
+  const arrow   = header.querySelector('.preview-spoiler-arrow');
+  const open    = content.style.display === 'none' || !content.style.display;
+  content.style.display  = open ? 'block' : 'none';
+  arrow.style.transform  = open ? 'rotate(180deg)' : '';
+}
+
+// ── RENDER HTML OUTPUT ────────────────────────────────────────────────
+function renderOutput() {
+  if (!spoilers.length) {
+    document.getElementById('outputCode').textContent = '\u2190 Add spoilers on the left first.';
+    return;
+  }
+
+  const uid = 'tg' + Math.random().toString(36).slice(2, 8);
+  const u   = '#' + uid;
+
+  const snippetCSS = [
+    u + ' .tgsh:hover{background:#e8e8e8!important}',
+    u + ' .tgsh.tgsh-open{background:#efefef!important}',
+    '@media(prefers-color-scheme:dark){',
+      u + ' .tgsw{background:#1e1e1e!important;border-color:#2a2a2a!important}',
+      u + ' .tgsh{background:#252525!important}',
+      u + ' .tgsh:hover{background:#2e2e2e!important}',
+      u + ' .tgsl{color:#f0f0f0!important}',
+      u + ' .tgsa{color:#888888!important}',
+      u + ' .tgsc{background:#161616!important;color:#c0c0c0!important}',
+    '}'
+  ].join('');
+
+  const WRAP = 'background:#fff;border:1px solid #d3d3d3;border-radius:6px;overflow:hidden;margin-bottom:24px';
+  const HDR  = 'display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:#f5f5f5;user-select:none';
+  const WARN = 'font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540';
+  const LBL  = 'flex:1;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:600;color:#111';
+  const ARR  = 'color:#666;transition:transform .2s;display:inline-block;font-size:12px';
+  const CONT = 'display:none;padding:14px 16px;background:#fff;color:#444;font-size:14px;line-height:1.6';
+  const TOGGLE_ONCLICK = "var c=this.nextElementSibling,a=this.querySelector('.tgsa'),o=c.style.display==='none'||!c.style.display;c.style.display=o?'block':'none';a.style.transform=o?'rotate(180deg)':''";
+
+  const items = spoilers.map(s => {
+    const h3          = s.heading ? "<h3 style='margin-top:24px'>" + esc(s.heading) + "</h3>\n" : '';
+    const labelHtml   = esc(s.label);
+    const contentHtml = esc(s.content).replace(/\n/g, '<br>');
+    return h3
+      + "<div class='tgsw' style='" + WRAP + "'>"
+      + "<div class='tgsh' style='" + HDR + "' onclick=\"" + TOGGLE_ONCLICK + "\">"
+      + "<span style='" + WARN + "'>&#x26A0;&#xFE0F; SPOILER</span>"
+      + "<span class='tgsl' style='" + LBL + "'>" + labelHtml + "</span>"
+      + "<span class='tgsa' style='" + ARR + "'>\u25BC</span>"
+      + "</div>"
+      + "<div class='tgsc' style='" + CONT + "'><p style='margin:0'>" + contentHtml + "</p></div>"
+      + "</div>";
+  }).join('\n');
+
+  const html = '<sty' + 'le>' + snippetCSS + '</sty' + 'le>\n'
+    + "<div id='" + uid + "' style='font-family:Roboto,sans-serif'>"
+    + items + '</div>';
+
+  const out = document.getElementById('outputCode');
+  out.textContent = html;
+  out.dataset.raw = html;
+}
+
+function copyAllHtml() {
+  const raw = document.getElementById('outputCode').dataset.raw;
+  if (!raw) { toast('\u26A0\uFE0F No HTML to copy yet.'); return; }
+  navigator.clipboard.writeText(raw).then(() => {
+    const btn = document.getElementById('copyAllBtn');
+    btn.textContent = '\u2713 Copied!';
+    btn.classList.add('copied');
+    toast('\u2713 HTML snippet copied to clipboard!');
+    setTimeout(() => {
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy HTML';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+
+function clearAll() {
+  if (!spoilers.length) return;
+  if (confirm('Remove all ' + spoilers.length + ' spoiler(s) and start over?')) {
+    spoilers = [];
+    renderAll();
+    toast('Section cleared.');
+  }
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────
+function renderAll() {
+  renderSpoilerList();
+  renderPreview();
+  if (document.getElementById('tabOutput').classList.contains('active')) renderOutput();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+setPreviewMode(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderAll);
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.target.id === 'fLabel') {
+    e.preventDefault();
+    document.getElementById('fContent').focus();
+  }
+  if (e.key === 'Enter' && e.ctrlKey && document.activeElement.closest('.form-section')) {
+    const btn = document.getElementById('addBtn');
+    if (!btn.disabled) addSpoiler();
+  }
+});
+</script>
+</body>
+</html>
