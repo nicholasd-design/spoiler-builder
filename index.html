@@ -527,48 +527,30 @@ function renderOutput() {
     return;
   }
 
-  const uid = 'tg' + Math.random().toString(36).slice(2, 8);
-  const u   = '#' + uid;
-
-  const snippetCSS = [
-    u + ' .tgsh:hover{background:#e8e8e8!important}',
-    u + ' .tgsh.tgsh-open{background:#efefef!important}',
-    '@media(prefers-color-scheme:dark){',
-      u + ' .tgsw{background:#1e1e1e!important;border-color:#2a2a2a!important}',
-      u + ' .tgsh{background:#252525!important}',
-      u + ' .tgsh:hover{background:#2e2e2e!important}',
-      u + ' .tgsl{color:#f0f0f0!important}',
-      u + ' .tgsa{color:#888888!important}',
-      u + ' .tgsc{background:#161616!important;color:#c0c0c0!important}',
-    '}'
-  ].join('');
-
-  const WRAP = 'background:#fff;border:1px solid #d3d3d3;border-radius:6px;overflow:hidden;margin-bottom:48px';
+  const WRAP = 'background:#ffffff;border:1px solid #d3d3d3;border-radius:6px;overflow:hidden;margin-bottom:48px';
   const HDR  = 'display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:#f5f5f5;user-select:none';
   const WARN = 'font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540';
-  const LBL  = 'flex:1;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:600;color:#111';
-  const ARR  = 'color:#666;transition:transform .2s;display:inline-block;font-size:12px';
-  const CONT = 'display:none;padding:14px 16px;background:#fff;color:#444;font-size:14px;line-height:1.6';
-  const TOGGLE_ONCLICK = "var c=this.nextElementSibling,a=this.querySelector('.tgsa'),o=c.style.display==='none'||!c.style.display;c.style.display=o?'block':'none';a.style.transform=o?'rotate(180deg)':''";
+  const LBL  = 'flex:1;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:600;color:#111111';
+  const ARR  = 'color:#666666;transition:transform .2s;display:inline-block;font-size:12px';
+  const CONT = 'display:none;padding:14px 16px;background:#ffffff;color:#444444;font-size:14px;line-height:1.6';
+  const TOGGLE_ONCLICK = "var c=this.nextElementSibling,a=this.lastElementChild,o=c.style.display==='none'||!c.style.display;c.style.display=o?'block':'none';a.style.transform=o?'rotate(180deg)':''";
 
   const items = spoilers.map(s => {
     const h3          = s.heading ? "<h3 style='margin-top:24px'>" + esc(s.heading) + "</h3>\n" : '';
     const labelHtml   = esc(s.label);
     const contentHtml = esc(s.content).replace(/\n/g, '<br>');
     return h3
-      + "<div class='tgsw' style='" + WRAP + "'>"
-      + "<div class='tgsh' style='" + HDR + "' onclick=\"" + TOGGLE_ONCLICK + "\">"
+      + "<div style='" + WRAP + "'>"
+      + "<div style='" + HDR + "' onclick=\"" + TOGGLE_ONCLICK + "\">"
       + "<span style='" + WARN + "'>&#x26A0;&#xFE0F; SPOILER</span>"
-      + "<span class='tgsl' style='" + LBL + "'>" + labelHtml + "</span>"
-      + "<span class='tgsa' style='" + ARR + "'>\u25BC</span>"
+      + "<span style='" + LBL + "'>" + labelHtml + "</span>"
+      + "<span style='" + ARR + "'>\u25BC</span>"
       + "</div>"
-      + "<div class='tgsc' style='" + CONT + "'><p style='margin:0'>" + contentHtml + "</p></div>"
+      + "<div style='" + CONT + "'><p style='margin:0'>" + contentHtml + "</p></div>"
       + "</div>";
   }).join('\n');
 
-  const html = '<sty' + 'le>' + snippetCSS + '</sty' + 'le>\n'
-    + "<div id='" + uid + "' style='font-family:Roboto,sans-serif'>"
-    + items + '</div>';
+  const html = "<div style='font-family:Roboto,sans-serif'>" + items + '</div>';
 
   const out = document.getElementById('outputCode');
   out.textContent = html;
