@@ -301,10 +301,6 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
           <input type="text" id="fLabel" placeholder="e.g. Final Boss Identity &amp; True Ending Revealed" oninput="updateCharCount('fLabel','cLabel',80); validateForm()">
           <div class="char-count" id="cLabel">0 / 80</div>
         </div>
-        <div class="field" style="display:flex;align-items:center;gap:10px">
-          <input type="checkbox" id="fNew" style="width:16px;height:16px;accent-color:#ff6b0f;cursor:pointer;flex-shrink:0">
-          <label for="fNew" style="text-transform:none;letter-spacing:0;font-size:13px;cursor:pointer;margin:0">Show <span style="background:#ff6b0f;color:#fff;font-size:11px;font-weight:700;padding:2px 6px;border-radius:3px;font-family:'Rajdhani',sans-serif">NEW!</span> badge</label>
-        </div>
         <div class="field">
           <label>Spoiler Content <span style="color:#ff1540">*</span></label>
           <textarea id="fContent" placeholder="Enter the spoiler text here..." oninput="validateForm()" rows="4"></textarea>
@@ -436,14 +432,12 @@ function addSpoiler() {
   const heading = document.getElementById('fHeading').value.trim();
   const label   = document.getElementById('fLabel').value.trim();
   const content = document.getElementById('fContent').value.trim();
-  const isNew   = document.getElementById('fNew').checked;
   if (!label || !content) return;
 
-  spoilers.push({ id: ++idCtr, heading, label, content, isNew });
+  spoilers.push({ id: ++idCtr, heading, label, content });
   document.getElementById('fHeading').value = '';
   document.getElementById('fLabel').value   = '';
   document.getElementById('fContent').value = '';
-  document.getElementById('fNew').checked   = false;
   document.getElementById('cLabel').textContent = '0 / 80';
   document.getElementById('addBtn').disabled = true;
   renderAll();
@@ -478,7 +472,7 @@ function renderSpoilerList() {
         <span class="spoiler-item-drag" title="Drag to reorder">\u2807</span>
         <div class="spoiler-item-body">
           ${s.heading ? `<div class="spoiler-item-preview" style="color:#ff6b0f">H3: ${esc(s.heading)}</div>` : ''}
-          <div class="spoiler-item-label">${esc(s.label)}${s.isNew ? ' <span style="background:#ff6b0f;color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;font-family:\'Rajdhani\',sans-serif;vertical-align:middle">NEW!</span>' : ''}</div>
+          <div class="spoiler-item-label">${esc(s.label)}</div>
           <div class="spoiler-item-preview">${esc(preview)}</div>
         </div>
         <div class="spoiler-item-actions">
@@ -507,7 +501,6 @@ function renderPreview() {
       <div class="preview-spoiler-header" style="background:${p.hdrBg}" onclick="previewToggle(this)">
         <span class="preview-spoiler-warn" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540">\u26A0\uFE0F SPOILER</span>
         <span class="preview-spoiler-label" style="font-family:'Rajdhani',sans-serif;font-size:20px;color:${p.label}">${esc(s.label)}</span>
-        ${s.isNew ? `<span style="background:#ff6b0f;color:#fff;font-size:12px;font-weight:700;padding:2px 7px;border-radius:3px;font-family:'Rajdhani',sans-serif;white-space:nowrap">NEW!</span>` : ''}
         <span class="preview-spoiler-arrow" style="color:${p.arrow}">\u25BC</span>
       </div>
       <div class="preview-spoiler-content" style="background:${p.contentBg};color:${p.contentText}">
@@ -567,7 +560,6 @@ function renderOutput() {
       + "<div class='tgsh' style='" + HDR + "' onclick=\"" + TOGGLE_ONCLICK + "\">"
       + "<span style='" + WARN + "'>&#x26A0;&#xFE0F; SPOILER</span>"
       + "<span class='tgsl' style='" + LBL + "'>" + labelHtml + "</span>"
-      + (s.isNew ? "<span style='background:#ff6b0f;color:#fff;font-size:12px;font-weight:700;padding:2px 7px;border-radius:3px;font-family:Rajdhani,sans-serif;white-space:nowrap;margin-right:6px'>NEW!</span>" : "")
       + "<span class='tgsa' style='" + ARR + "'>\u25BC</span>"
       + "</div>"
       + "<div class='tgsc' style='" + CONT + "'><p style='margin:0'>" + contentHtml + "</p></div>"
