@@ -376,7 +376,7 @@ function palette(dark) {
   return dark
     ? { bg:'#1e1e1e', border:'#2a2a2a', hdrBg:'#252525', hdrHover:'#2e2e2e',
         warn:'#ff6600', label:'#f0f0f0', arrow:'#888888',
-        contentBg:'#161616', contentText:'#c0c0c0' }
+        contentBg:'#161616', contentText:'#f0f0f0' }
     : { bg:'#ffffff', border:'#d3d3d3', hdrBg:'#f5f5f5', hdrHover:'#ececec',
         warn:'#ff6b0f', label:'#111111', arrow:'#666666',
         contentBg:'#ffffff', contentText:'#444444' };
@@ -503,7 +503,7 @@ function renderPreview() {
         <span class="preview-spoiler-label" style="font-family:'Rajdhani',sans-serif;font-size:20px;color:${p.label}">${esc(s.label)}</span>
         <span class="preview-spoiler-arrow" style="color:${p.arrow}">\u25BC</span>
       </div>
-      <div class="preview-spoiler-content" style="background:${p.contentBg};color:${p.contentText}">
+      <div class="preview-spoiler-content" style="background:${p.contentBg};color:${p.contentText};font-family:Georgia,Times,'Times New Roman',serif">
         ${esc(s.content).replace(/\n/g, '<br>')}
       </div>
     </div>`
@@ -533,7 +533,7 @@ function renderOutput() {
   const WARN = 'margin:0;flex-shrink:0;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540';
   const LBL  = 'margin:0;flex:1;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:600;color:light-dark(#111111,#f0f0f0)';
   const ARR  = 'margin:0;color:light-dark(#666666,#888888);transition:transform .2s;display:inline-block;font-size:12px';
-  const CONT = 'display:none;padding:14px 16px;background:light-dark(#ffffff,#161616);color:light-dark(#444444,#c0c0c0);font-family:Montserrat,sans-serif;font-size:14px;line-height:1.6;margin:0';
+  const CONT = 'display:none;padding:14px 16px;background:light-dark(#ffffff,#161616);color:light-dark(#444444,#f0f0f0);font-family:Georgia,Times,&#39;Times New Roman&#39;,serif!important;font-size:14px;line-height:1.6;margin:0';
   const TOGGLE_ONCLICK = "var c=this.nextElementSibling,a=this.lastElementChild,o=c.style.display==='none'||!c.style.display;c.style.display=o?'block':'none';a.style.transform=o?'rotate(180deg)':''";
 
   const items = spoilers.map(s => {
