@@ -550,15 +550,22 @@ function renderOutput() {
       + "</div>";
   }).join('\n');
 
-  const dark = '@media(prefers-color-scheme:dark){'
-    + '[data-sp-w]{background:#1e1e1e!important;border-color:#2a2a2a!important}'
-    + '[data-sp-h]{background:#252525!important}'
-    + '[data-sp-l]{color:#f0f0f0!important}'
-    + '[data-sp-a]{color:#888888!important}'
-    + '[data-sp-c]{background:#161616!important;color:#c0c0c0!important}'
-    + '}';
+  // Dark mode via onerror on a bogus img — fires inline without a <script> block
+  const darkFn = "(function(){"
+    + "var m=window.matchMedia('(prefers-color-scheme:dark)'),"
+    + "q=function(s){return document.querySelectorAll(s)},"
+    + "f=function(d){"
+    + "q('[data-sp-w]').forEach(function(e){e.style.background=d?'#1e1e1e':'#ffffff';e.style.borderColor=d?'#2a2a2a':'#d3d3d3'});"
+    + "q('[data-sp-h]').forEach(function(e){e.style.background=d?'#252525':'#f5f5f5'});"
+    + "q('[data-sp-l]').forEach(function(e){e.style.color=d?'#f0f0f0':'#111111'});"
+    + "q('[data-sp-a]').forEach(function(e){e.style.color=d?'#888888':'#666666'});"
+    + "q('[data-sp-c]').forEach(function(e){e.style.background=d?'#161616':'#ffffff';e.style.color=d?'#c0c0c0':'#444444'});"
+    + "};"
+    + "window._spDark||(window._spDark=1,m.addEventListener('change',function(e){f(e.matches)}));"
+    + "f(m.matches);"
+    + "})()";
 
-  const html = '<sty' + 'le>' + dark + '</sty' + 'le>\n'
+  const html = '<img src="x" style="display:none" onerror="' + darkFn + '">\n'
     + "<div style='font-family:Roboto,sans-serif'>" + items + '</div>';
 
   const out = document.getElementById('outputCode');
