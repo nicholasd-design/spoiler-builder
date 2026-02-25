@@ -527,12 +527,13 @@ function renderOutput() {
     return;
   }
 
-  const WRAP = 'background:#ffffff;border:1px solid #d3d3d3;border-radius:6px;overflow:hidden;margin-bottom:48px';
-  const HDR  = 'display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:#f5f5f5;user-select:none';
+  // light-dark() resolves via system prefers-color-scheme — no JS or <style> needed
+  const WRAP = 'background:light-dark(#ffffff,#1e1e1e);border:1px solid light-dark(#d3d3d3,#2a2a2a);border-radius:6px;overflow:hidden;margin-bottom:48px';
+  const HDR  = 'display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:light-dark(#f5f5f5,#252525);user-select:none';
   const WARN = 'font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540';
-  const LBL  = 'flex:1;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:600;color:#111111';
-  const ARR  = 'color:#666666;transition:transform .2s;display:inline-block;font-size:12px';
-  const CONT = 'display:none;padding:14px 16px;background:#ffffff;color:#444444;font-size:14px;line-height:1.6';
+  const LBL  = 'flex:1;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:600;color:light-dark(#111111,#f0f0f0)';
+  const ARR  = 'color:light-dark(#666666,#888888);transition:transform .2s;display:inline-block;font-size:12px';
+  const CONT = 'display:none;padding:14px 16px;background:light-dark(#ffffff,#161616);color:light-dark(#444444,#c0c0c0);font-size:14px;line-height:1.6';
   const TOGGLE_ONCLICK = "var c=this.nextElementSibling,a=this.lastElementChild,o=c.style.display==='none'||!c.style.display;c.style.display=o?'block':'none';a.style.transform=o?'rotate(180deg)':''";
 
   const items = spoilers.map(s => {
@@ -550,23 +551,8 @@ function renderOutput() {
       + "</div>";
   }).join('\n');
 
-  // Dark mode via onerror on a bogus img — fires inline without a <script> block
-  const darkFn = "(function(){"
-    + "var m=window.matchMedia('(prefers-color-scheme:dark)'),"
-    + "q=function(s){return document.querySelectorAll(s)},"
-    + "f=function(d){"
-    + "q('[data-sp-w]').forEach(function(e){e.style.background=d?'#1e1e1e':'#ffffff';e.style.borderColor=d?'#2a2a2a':'#d3d3d3'});"
-    + "q('[data-sp-h]').forEach(function(e){e.style.background=d?'#252525':'#f5f5f5'});"
-    + "q('[data-sp-l]').forEach(function(e){e.style.color=d?'#f0f0f0':'#111111'});"
-    + "q('[data-sp-a]').forEach(function(e){e.style.color=d?'#888888':'#666666'});"
-    + "q('[data-sp-c]').forEach(function(e){e.style.background=d?'#161616':'#ffffff';e.style.color=d?'#c0c0c0':'#444444'});"
-    + "};"
-    + "window._spDark||(window._spDark=1,m.addEventListener('change',function(e){f(e.matches)}));"
-    + "f(m.matches);"
-    + "})()";
-
-  const html = '<img src="x" style="display:none" onerror="' + darkFn + '">\n'
-    + "<div style='font-family:Roboto,sans-serif'>" + items + '</div>';
+  // color-scheme on the outer div enables light-dark() for all descendants
+  const html = "<div style='font-family:Roboto,sans-serif;color-scheme:light dark'>" + items + '</div>';
 
   const out = document.getElementById('outputCode');
   out.textContent = html;
