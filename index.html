@@ -530,7 +530,7 @@ function renderOutput() {
   // light-dark() resolves via system prefers-color-scheme — no JS or <style> needed
   const WRAP = 'background:light-dark(#ffffff,#1e1e1e);border:1px solid light-dark(#d3d3d3,#2a2a2a);border-radius:6px;overflow:hidden;margin-bottom:48px';
   const HDR  = 'display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:light-dark(#f5f5f5,#252525);user-select:none';
-  const WARN = 'font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540';
+  const WARN = 'flex-shrink:0;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;white-space:nowrap;background:rgba(255,21,64,.12);border:1px solid rgba(255,21,64,.3);border-radius:4px;padding:2px 8px;color:#ff1540';
   const LBL  = 'flex:1;font-family:Rajdhani,sans-serif;font-size:20px;font-weight:600;color:light-dark(#111111,#f0f0f0)';
   const ARR  = 'color:light-dark(#666666,#888888);transition:transform .2s;display:inline-block;font-size:12px';
   const CONT = 'display:none;padding:14px 16px;background:light-dark(#ffffff,#161616);color:light-dark(#444444,#c0c0c0);font-size:14px;line-height:1.6';
@@ -543,7 +543,7 @@ function renderOutput() {
     return h3
       + "<div data-sp-w style='" + WRAP + "'>"
       + "<div data-sp-h style='" + HDR + "' onclick=\"" + TOGGLE_ONCLICK + "\">"
-      + "<span style='" + WARN + "'>&#x26A0;&#xFE0F; SPOILER</span>"
+      + "<div style='" + WARN + "'>&#x26A0;&#xFE0F; SPOILER</div>"
       + "<span data-sp-l style='" + LBL + "'>" + labelHtml + "</span>"
       + "<span data-sp-a style='" + ARR + "'>\u25BC</span>"
       + "</div>"
